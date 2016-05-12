@@ -14,7 +14,7 @@ function medicine_fixed_dose($medicine, $fixed_dose, $max_dose, $unit_dose, $dec
 
    print "$medicine $dose $unit_dose (dosering: $fixed_dose $unit_dose, maximum: $max_dose $unit_dose)\n";
 }
-function medicine_pump($medicine, $fixed_dose_SST, $dose_unit_SST, $fixed_fluid_SST, $fluid_unit_SST, $upper_limit_dose_pt, $lower_limit_dose_pt, $dose_unit_pt, $fluid_unit_pt, $unit_dhm, $decimals_dose, $weight ) {
+function medicine_pump($medicine, $fixed_dose_SST, $dose_unit_SST, $fixed_fluid_SST, $fluid_unit_SST, $upper_limit_dose_pt, $lower_limit_dose_pt, $dose_unit_pt, $unit_dhm, $decimals_dose, $weight ) {
   
    // voorbereiding van variabelen
    $weight = ereg_replace (',', '.', $weight);
@@ -23,7 +23,6 @@ function medicine_pump($medicine, $fixed_dose_SST, $dose_unit_SST, $fixed_fluid_
    $dose_unit_SST_array = array (0 => 'gr', 1 => 'dgr', 2 => 'cgr', 3 => 'mg', 6=> 'microg', 9=> 'nanog');
    $fluid_unit_SST_array = array (0 => 'l', 1 => 'dl', 2 => 'cl', 3 => 'ml', 6=> 'microl', 9=> 'nanol');
    $dose_unit_pt_array = array (0 => 'gr', 1 => 'dgr', 2 => 'cgr', 3 => 'mg', 6=> 'microg', 9=> 'nanog');
-   $fluid_unit_pt_array = array (0 => 'l', 1 => 'dl', 2 => 'cl', 3 => 'ml', 6=> 'microl', 9=> 'nanol');
    $unit_dhm_array = array (0 => 'dag', 1 => 'uur', 2 => 'minuut', 3 => 'seconde', 4 => 'miliseconde');
    
    // berekening stand bij minimale (begin)stand 
@@ -105,8 +104,8 @@ echo "Reanimatie: \n";
 
 // parameters: medicijnnaam, dosering in SST, eenheid in SST, hoeveelheid SST, eenheid SST,
 // bovenlimiet hoeveelheid medicijn per tijd, onderlimiteit hoeveelheid medicijn per tijd,
-// eenheid medicijn per tijd, eenheid SST per tijd, tijd, aantal decimalen
-medicine_pump("Midazolam", 25, 3, 50, 3, 0.5, 0.1, 6, 3, 3, 1, $weight);
+// eenheid medicijn per tijd, tijd, aantal decimalen
+medicine_pump("Midazolam", 25, 3, 50, 3, 0.5, 0.1, 3, 1, 1, $weight);
 
 ?>
 
