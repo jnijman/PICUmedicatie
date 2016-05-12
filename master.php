@@ -14,53 +14,79 @@ function medicine_fixed_dose($medicine, $fixed_dose, $max_dose, $unit_dose, $dec
 
    print "$medicine $dose $unit_dose (dosering: $fixed_dose $unit_dose, maximum: $max_dose $unit_dose)\n";
 }
-function medicine_pump($medicine, $fixed_dose, $unit_dose, $unit_dhm, $upper_limit_dose, $lower_limit_dose, $decimals_dose, $fluid_dose, $fluid_unit, $weight ) {
+function medicine_pump($medicine, $fixed_dose_SST, $dose_unit_SST, $fixed_fluid_SST, $fluid_unit_SST, $upper_limit_dose_pt, $lower_limit_dose_pt, $dose_unit_pt, $fluid_unit_pt, $unit_dhm, $decimals_dose, $weight ) {
   
    // voorbereiding van variabelen
    $weight = ereg_replace (',', '.', $weight);
 
    // omzetten numerieke dosering in textdosering 
-   // $unit_dose
-   if ($unit_dose == 0): $text_unit_dose = "gr";
-    elseif ($unit_dose == 1000): $text_unit_dose = "mg";
-    elseif ($unit_dose == 1000000): $text_unit_dose = "ug";
-    else: $text_unit_dose ="??";
-   endif;
+   $dose_unit_SST_array = array (0 => 'gr', 1 => 'dgr', 2 => 'cgr', 3 => 'mg', 6=> 'microg', 9=> 'nanog');
+   $fluid_unit_SST_array = array (0 => 'l', 1 => 'dl', 2 => 'cl', 3 => 'ml', 6=> 'microl', 9=> 'nanol');
+   $dose_unit_pt_array = array (0 => 'gr', 1 => 'dgr', 2 => 'cgr', 3 => 'mg', 6=> 'microg', 9=> 'nanog');
+   $fluid_unit_pt_array = array (0 => 'l', 1 => 'dl', 2 => 'cl', 3 => 'ml', 6=> 'microl', 9=> 'nanol');
+   $unit_dhm_array = array (0 => 'dag', 1 => 'uur', 2 => 'minuut', 3 => 'seconde', 4 => 'miliseconde');
    
-   // $unit_dhm
-   if ($unit_dhm == 0): $text_unit_dhm = "dag";
-    elseif ($unit_dhm == 24): $text_unit_dhm = "uur";
-    elseif ($unit_dhm == 1440): $text_unit_dhm = "minuut";
-    elseif ($unit_dhm == 86400): $text_unit_dhm = "seconde";
-    else: $text_unit_dhm ="??";
-   endif;
+   // berekening stand bij minimale (begin)stand 
+   $infusion = $lower_limit_dose_pt * $weight; // hoeveelheid per $unit_dhm
    
-   // $fluid_unit
-   if ($fluid_unit == 0): $text_fluid_unit = "l";
-    elseif ($fluid_unit == 1000): $text_fluid_unit = "ml";
-    elseif ($fluid_unit == 1000000): $text_fluid_unit = "ul";
-    else: $text_fluid_unit ="??";
-   endif;
+   // terugrekenen naar mg
+   switch ($dose_unit_pt) {
+     case 0: $infusion = $infusion * 1000; break;
+     case 1: $infusion = $infusion * 100; break;
+     case 2: $infusion = $infusion * 10; break;
+     case 3: $infusion = $infusion * 1; break;
+     case 6: $infusion = $infusion / 1000; break;
+     case 9: $infusion = $infusion / 1000000; break;
+   } 
    
-   // berekening stand bij minimale (begin)stand
-   $infusion = $lower_limit_dose * $weight; // hoeveelheid units per tijd
+   // terugrekenen naar per uur
+   switch ($unit_dhm) {
+     case 0: $infusion = $infusion * 24; break;
+     case 1: $infusion = $infusion * 1; break;
+     case 2: $infusion = $infusion / 60; break;
+     case 3: $infusion = $infusion / 3600; break;
+     case 4: $infusion = $infusion / 3600 / 1000; break;
+   }
    
+   // hoeveelheid dosis per hoeveelheid vloeistof
+   $dose_per_SST = $fixed_dose_SST / $fixed_fluid_SST;
    
+   // dosis in SST terugrekenen naar mg
+    switch ($dose_unit_SST) {
+     case 0: $dose_per_SST = $dose_per_SST * 1000; break;
+     case 1: $dose_per_SST = $dose_per_SST * 100; break;
+     case 2: $dose_per_SST = $dose_per_SST * 10; break;
+     case 3: $dose_per_SST = $dose_per_SST * 1; break;
+     case 6: $dose_per_SST = $dose_per_SST / 1000; break;
+     case 9: $dose_per_SST = $dose_per_SST / 1000000; break;
+   }
    
-    print "medicine: $medicine\n";
-    print "fixed dose: $fixed_dose\n";
-    print "unit dose in grams (0), milligrams (1000) or micrograms (1000000): $unit_dose\n";
-    print "text unit dose: $text_unit_dose\n";
-    print "unit per day (0), hour (24) or minute (1440) or second (86400): $unit_dhm\n";
-    print "text unit time: $text_unit_dhm\n";
-    print "upper limit dose: $upper_limit_dose\n";
-    print "lower limit dose: $lower_limit_dose\n";
-    print "decimals dose: $decimals_dose\n";
-    print "fluid dose: $fluid_dose\n";
-    print "fluid unit in liters (0), milliliters (1000) or microliters (1000000): $fluid_unit\n";
-    print "text fluid unit: $text_fluid_unit\n";
-    print "weight: $weight\n";
-  
+   // dosis in SST terugrekenen naar ml
+    switch ($fluid_unit_SST) {
+     case 0: $dose_per_SST = $dose_per_SST * 1000; break;
+     case 1: $dose_per_SST = $dose_per_SST * 100; break;
+     case 2: $dose_per_SST = $dose_per_SST * 10; break;
+     case 3: $dose_per_SST = $dose_per_SST * 1; break;
+     case 6: $dose_per_SST = $dose_per_SST / 1000; break;
+     case 9: $dose_per_SST = $dose_per_SST / 1000000; break;
+   }
+
+    echo "medicine: $medicine\n";
+      echo "fixed dose in SST: $fixed_dose_SST\n";
+      echo "dose unit in SST: $dose_unit_SST_array[$dose_unit_SST]\n";
+      echo "fixed quantity of fluid in SST: $fixed_fluid_SST\n";
+      echo "unit of fluid in SST: $fluid_unit_SST_array[$fluid_unit_SST]\n";
+      echo "upper limit of dose in pt: $upper_limit_dose_pt\n";
+      echo "lower limit of dose in pt: $lower_limit_dose_pt\n";
+      echo "dose unit in pt: $dose_unit_pt_array[$dose_unit_pt]\n";
+      echo "fluid unit in pt: $fluid_unit_pt_array[$fluid_unit_pt]\n";
+      echo "time unit in pt: $unit_dhm_array[$unit_dhm]\n";
+      echo "number of decimals: $decimals_dose\n";
+    echo "weight: $weight\n\n";
+    echo "hoeveelheid per tijdseenheid bij minimale stand (mg/uur): $infusion\n\n";
+    echo "dosis per uur (mg/ml/uur): $dose_per_SST\n\n";
+    echo "infuusstand: ". $infusion / $dose_per_SST ." ml/uur";
+
 }
 
 
@@ -76,7 +102,11 @@ echo "Leeftijd: \n \n";
 echo "Reanimatie: \n";
 // medicine_fixed_dose("Adrenaline", 10, 1000, "ug/kg", 0, $weight );
 // medicine_fixed_dose("Amiodarone", 5, 500, "mg/kg", 0, $weight );
-medicine_pump("Midazolam", 25, 1000, 24, 0.1, 0.5, 1, 50, 1000, $weight)
+
+// parameters: medicijnnaam, dosering in SST, eenheid in SST, hoeveelheid SST, eenheid SST,
+// bovenlimiet hoeveelheid medicijn per tijd, onderlimiteit hoeveelheid medicijn per tijd,
+// eenheid medicijn per tijd, eenheid SST per tijd, tijd, aantal decimalen
+medicine_pump("Midazolam", 25, 3, 50, 3, 0.5, 0.1, 6, 3, 3, 1, $weight);
 
 ?>
 
